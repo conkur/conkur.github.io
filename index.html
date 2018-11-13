@@ -27,6 +27,26 @@
             height: 100%; 
             position: fixed;
         }
+        .category-labels {
+            margin-bottom: 10px;
+        }
+        .category-label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .level-labels {
+            display: flex;
+            justify-content: space-between;
+        }
+        .name-textbox {
+            margin-bottom: 10px;
+        }
+
+        /* Overriden CSS */
+        .leaflet-popup-content {
+            max-width: 200px;
+            max-height: 175px;
+        }
     </style>
     
     <script>
@@ -101,25 +121,41 @@
                         categoryInputClass: 'leaflet-bookmarks-form-category',
                         levelInputClass: 'leaflet-bookmarks-form-level',
                     },
-                    template: '<form class="{{ formClass }}">' +
-                        '<div class="input-group">' +
-                            '<input type="text" name="bookmark-name" placeholder="Marker name" class="form-control {{ inputClass }}" value="{{ name }}">' +
-                            '<input type="hidden" class={{ idInputClass }} value="{{ id }}">' +
-                            '<br><br>' +
-                            '<input type="radio" class={{ categoryInputClass }} name="category" value="placeOfInterest" checked>Place of Interest' +
-                            '<input type="radio" class={{ categoryInputClass }} name="category" value="lockpick">Locksmith' +
-                            '<input type="radio" class={{ categoryInputClass }} name="category" value="hacking">Hacking' +
-                            '<br><br>' +
-                            '<span style="font-weight: bold;">(Optional) Select a level if choosing locking or hacking:</span>' +
-                            '<br>' +
-                            '<input type="radio" class={{ levelInputClass }} name="level" value="1">1' +
-                            '<input type="radio" class={{ levelInputClass }} name="level" value="2">2' +
-                            '<input type="radio" class={{ levelInputClass }} name="level" value="3">3' +
-                            '<input type="radio" class={{ levelInputClass }} name="level" value="" checked style="visibility:hidden;">' +
-                            '<br>' +
-                            '<button type="submit" class="input-group-addon {{ submitClass }}">{{ submitText }}</button>' +
-                        '</div>' +
-                        '</form>',
+                    template: 
+                        `<form class="{{ formClass }}">
+                            <div class="input-group">
+                                <input type="text" name="bookmark-name" placeholder="Marker name" class="name-textbox form-control {{ inputClass }}" value="{{ name }}">
+                                <button type="submit" style="margin-left: 10px; height: 40px; width: 40px" class="input-group-addon {{ submitClass }}">{{ submitText }}</button>
+                                <input type="hidden" class={{ idInputClass }} value="{{ id }}">
+                                <br>
+                                <div class="category-labels">
+                                    <label class="category-label">
+                                        <input type="radio" class={{ categoryInputClass }} name="category" value="placeOfInterest" checked >Place of Interest
+                                    </label>
+                                    <label class="category-label">
+                                        <input type="radio" class={{ categoryInputClass }} name="category" value="lockpick" onclick="">Locksmith
+                                    </label>
+                                    <label class="category-label">
+                                        <input type="radio" class={{ categoryInputClass }} name="category" value="hacking" onclick="">Hacking
+                                    </label>
+                                </div>
+                                <span style="font-weight: bold;">(Optional) Select a level if choosing locking or hacking:</span>
+                                <br>
+                                <div class="level-labels">
+                                    <label class="level-label">
+                                        <input type="radio" class={{ levelInputClass }} name="level" value="1">1
+                                    </label>
+                                    <label class="level-label">
+                                        <input type="radio" class={{ levelInputClass }} name="level" value="2">2
+                                    </label>
+                                    <label class="level-label">
+                                        <input type="radio" class={{ levelInputClass }} name="level" value="3">3
+                                    </label>
+                                    <input type="radio" class={{ levelInputClass }} name="level" value="" checked style="visibility:hidden;">
+                                </div>
+                            </div>
+                        </form>
+                        `,
                     getBookmarkData: function() {
                         var nameInput = this._contentNode.querySelector('.' + this.options.templateOptions.inputClass);
                         var categoryInput = this._contentNode.querySelector('input[name="category"]:checked');
