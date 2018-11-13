@@ -41,11 +41,14 @@
         .name-textbox {
             margin-bottom: 10px;
         }
+        .add-new-bookmark-button {
+            margin-left: 10px !important;
+        }
 
         /* Overriden CSS */
         .leaflet-popup-content {
-            max-width: 200px;
-            max-height: 175px;
+           max-width: 220px;
+           max-height: 175px;
         }
     </style>
     
@@ -125,7 +128,7 @@
                         `<form class="{{ formClass }}">
                             <div class="input-group">
                                 <input type="text" name="bookmark-name" placeholder="Marker name" class="name-textbox form-control {{ inputClass }}" value="{{ name }}">
-                                <button type="submit" style="margin-left: 10px; height: 40px; width: 40px" class="input-group-addon {{ submitClass }}">{{ submitText }}</button>
+                                <button type="submit" class="add-new-bookmark-button input-group-addon {{ submitClass }}">{{ submitText }}</button>
                                 <input type="hidden" class={{ idInputClass }} value="{{ id }}">
                                 <br>
                                 <div class="category-labels">
@@ -133,7 +136,7 @@
                                         <input type="radio" class={{ categoryInputClass }} name="category" value="placeOfInterest" checked >Place of Interest
                                     </label>
                                     <label class="category-label">
-                                        <input type="radio" class={{ categoryInputClass }} name="category" value="lockpick" onclick="">Locksmith
+                                        <input type="radio" class={{ categoryInputClass }} name="category" value="locking" onclick="">Lockpick
                                     </label>
                                     <label class="category-label">
                                         <input type="radio" class={{ categoryInputClass }} name="category" value="hacking" onclick="">Hacking
