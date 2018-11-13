@@ -68,10 +68,9 @@
                 
                 popupTemplate: '<div><h3>{name}</h3><p>{description}</p></div>',
                 getPopupContent: function(bookmark) {
-                    const capitalizedCategoryName = bookmark.category.charAt(0).toUpperCase() + bookmark.category.slice(1);
                     return L.Util.template(this.options.popupTemplate, {
                         name: bookmark.name,
-                        description: bookmark.category ? `${capitalizedCategoryName}: ${bookmark.level}` : '',
+                        description: getBookmarkDescription(bookmark),
                     });
                 },
 
@@ -79,7 +78,7 @@
                     generateNamesPrefix: 'Marker',
                     templateOptions: {
                         formClass: 'leaflet-bookmarks-form',
-                        inputClass: 'leaflet-bookmarks-form-input',
+                        inputClass: 'leaflet-bookmarks-form-name',
                         inputErrorClass: 'has-error',
                         idInputClass: 'leaflet-bookmarks-form-id',
                         coordsClass: 'leaflet-bookmarks-form-coords',
@@ -97,7 +96,7 @@
                         submitTextCreate: '+',
                         submitTextEdit: '<span class="icon-checkmark"></span>',
 
-                        // My Custom fields
+                        // My custom fields
                         idInputClass: 'leaflet-bookmarks-form-id',
                         categoryInputClass: 'leaflet-bookmarks-form-category',
                         levelInputClass: 'leaflet-bookmarks-form-level',
@@ -107,11 +106,11 @@
                             '<input type="text" name="bookmark-name" placeholder="Marker name" class="form-control {{ inputClass }}" value="{{ name }}">' +
                             '<input type="hidden" class={{ idInputClass }} value="{{ id }}">' +
                             '<br><br>' +
+                            '<input type="radio" class={{ categoryInputClass }} name="category" value="placeOfInterest" checked>Place of Interest' +
                             '<input type="radio" class={{ categoryInputClass }} name="category" value="lockpick">Locksmith' +
                             '<input type="radio" class={{ categoryInputClass }} name="category" value="hacking">Hacking' +
-                            '<input type="radio" class={{ categoryInputClass }} name="category" value="note" checked>Note' +
                             '<br><br>' +
-                            '<span style="font-weight: bold;">Select a level if choosing locking or hacking:</span>' +
+                            '<span style="font-weight: bold;">(Optional) Select a level if choosing locking or hacking:</span>' +
                             '<br>' +
                             '<input type="radio" class={{ levelInputClass }} name="level" value="1">1' +
                             '<input type="radio" class={{ levelInputClass }} name="level" value="2">2' +
@@ -142,14 +141,22 @@
                 '</li>',
 
                  getBookmarkDataForTemplate: function(bookmark) {
-                    const capitalizedCategoryName = bookmark.category.charAt(0).toUpperCase() + bookmark.category.slice(1);
                     return {
+                        id: bookmark.id,
                         name: bookmark.name,
-                        description: bookmark.category ? `${capitalizedCategoryName}: ${bookmark.level}` : '',
-                        id: bookmark.id
+                        description: getBookmarkDescription(bookmark),
                     };
                 },
             };
+
+            function getBookmarkDescription(bookmark) {
+                let description = 'Place of Interest';
+                if (bookmark.category !== 'placeOfInterest') {
+                    const capitalizedCategoryName = bookmark.category.charAt(0).toUpperCase() + bookmark.category.slice(1);
+                    description = bookmark.level ? `${capitalizedCategoryName}: ${bookmark.level}` : capitalizedCategoryName;
+                }
+                return description;
+            }
 
             var bookmarksControl = new L.Control.Bookmarks(bookmarkOptions).addTo(map);
 
