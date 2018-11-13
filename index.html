@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Fallout 76 Map Marker</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-bookmarks@0.2.5/dist/Leaflet.Bookmarks.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-bookmarks@0.2.5/dist/leaflet.bookmarks.min.css">
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 100%;
+			height: 100%;
+		}
+        .map-wrapper { 
+            width: 100%;
+            height: 100%; 
+            position: fixed;
+        }
+    </style>
+    
+    <script>
+        function main() {
+            const minZoom = 2;
+            const center = [0, 118];
+            var map = L.map('map', {
+                center,
+                minZoom,
+                maxZoom: 4,
+                crs: L.CRS.Simple,
+                maxBoundsViscosity: 1.0, // Prevent white space surrounding image when click-and-dragging map.
+            }).setView(center, minZoom);
+
+            const imageWidth = 1920;
+            const imageHeight = 1915;
+            const url = 'https://cdn.gamerant.com/wp-content/uploads/fallout-76-full-map-west-virginia.jpg.optimal.jpg';
+
+            // Calculate the edges of the image, in coordinate space.
+            var southWest = map.unproject([0, imageHeight], map.getMaxZoom() - 1);
+            var northEast = map.unproject([imageWidth, 0], map.getMaxZoom() - 1);
+            var bounds = new L.LatLngBounds(southWest, northEast);
+            
+            // Add the image overlay, so that it covers the entire map.
+            L.imageOverlay(url, bounds).addTo(map);
+
+            // Tell leaflet that the map is exactly as big as the image.
+            map.setMaxBounds(bounds);
+            
+            setupBookmarks(map);
+        }
+
+        function setupBookmarks(map) {
+            const bookmarkOptions = {
+
+                // no bookmarks text
+                emptyMessage: "Add something, ye lone wanderer.",
+                addNewOption: false, // TODO: Add feature to show all markers at once.
+                
+                popupTemplate: '<div><h3>{name}</h3><p>{description}</p></div>',
+                getPopupContent: function(bookmark) {
+                    const capitalizedCategoryName = bookmark.category.charAt(0).toUpperCase() + bookmark.category.slice(1);
+                    return L.Util.template(this.options.popupTemplate, {
+                        name: bookmark.name,
+                        description: bookmark.category ? `${capitalizedCategoryName}: ${bookmark.level}` : '',
+                    });
+                },
+
+                formPopup: {
+                    generateNamesPrefix: 'Marker',
+                    templateOptions: {
+                        formClass: 'leaflet-bookmarks-form',
+                        inputClass: 'leaflet-bookmarks-form-input',
+                        inputErrorClass: 'has-error',
+                        idInputClass: 'leaflet-bookmarks-form-id',
+                        coordsClass: 'leaflet-bookmarks-form-coords',
+                        submitClass: 'leaflet-bookmarks-form-submit',
+                        inputPlaceholder: 'Bookmark name',
+                        removeClass: 'leaflet-bookmarks-form-remove',
+                        editClass: 'leaflet-bookmarks-form-edit',
+                        cancelClass: 'leaflet-bookmarks-form-cancel',
+                        editableClass: 'editable',
+                        removableClass: 'removable',
+                        menuItemClass: 'nav-item',
+                        editMenuText: 'Edit',
+                        removeMenuText: 'Remove',
+                        cancelMenuText: 'Cancel',
+                        submitTextCreate: '+',
+                        submitTextEdit: '<span class="icon-checkmark"></span>',
+
+                        // My Custom fields
+                        idInputClass: 'leaflet-bookmarks-form-id',
+                        categoryInputClass: 'leaflet-bookmarks-form-category',
+                        levelInputClass: 'leaflet-bookmarks-form-level',
+                    },
+                    template: '<form class="{{ formClass }}">' +
+                        '<div class="input-group">' +
+                            '<input type="text" name="bookmark-name" placeholder="Marker name" class="form-control {{ inputClass }}" value="{{ name }}">' +
+                            '<input type="hidden" class={{ idInputClass }} value="{{ id }}">' +
+                            '<br><br>' +
+                            '<input type="radio" class={{ categoryInputClass }} name="category" value="lockpick">Locksmith' +
+                            '<input type="radio" class={{ categoryInputClass }} name="category" value="hacking">Hacking' +
+                            '<input type="radio" class={{ categoryInputClass }} name="category" value="note" checked>Note' +
+                            '<br><br>' +
+                            '<span style="font-weight: bold;">Select a level if choosing locking or hacking:</span>' +
+                            '<br>' +
+                            '<input type="radio" class={{ levelInputClass }} name="level" value="1">1' +
+                            '<input type="radio" class={{ levelInputClass }} name="level" value="2">2' +
+                            '<input type="radio" class={{ levelInputClass }} name="level" value="3">3' +
+                            '<input type="radio" class={{ levelInputClass }} name="level" value="" checked style="visibility:hidden;">' +
+                            '<br>' +
+                            '<button type="submit" class="input-group-addon {{ submitClass }}">{{ submitText }}</button>' +
+                        '</div>' +
+                        '</form>',
+                    getBookmarkData: function() {
+                        var nameInput = this._contentNode.querySelector('.' + this.options.templateOptions.inputClass);
+                        var categoryInput = this._contentNode.querySelector('input[name="category"]:checked');
+                        var levelInput = this._contentNode.querySelector('input[name="level"]:checked');
+                        return {
+                            id: nameInput.value + Math.floor(Math.random() * 1000),
+                            name: nameInput.value || categoryInput.value + ': ' + levelInput.value,
+                            category: categoryInput.checked ? categoryInput.value : null,
+                            level: levelInput.checked ? levelInput.value : null,
+                            latlng: this._source.getLatLng(),
+                        };
+                    },
+                },
+
+                bookmarkTemplate: '<li class="{{ itemClass }}" data-id="{{ data.id }}">' +
+                    '<span class="{{ removeClass }}">&times;</span>' +
+                    '<span class="{{ nameClass }}">{{ data.name }}</span>' +
+                    '<span class="{{ coordsClass }}">{{ data.description }}</span>' +
+                '</li>',
+
+                 getBookmarkDataForTemplate: function(bookmark) {
+                    const capitalizedCategoryName = bookmark.category.charAt(0).toUpperCase() + bookmark.category.slice(1);
+                    return {
+                        name: bookmark.name,
+                        description: bookmark.category ? `${capitalizedCategoryName}: ${bookmark.level}` : '',
+                        id: bookmark.id
+                    };
+                },
+            };
+
+            var bookmarksControl = new L.Control.Bookmarks(bookmarkOptions).addTo(map);
+
+            map.on('contextmenu', function(e) {
+                map.fire('bookmark:new', {
+                    latlng: e.latlng,
+                });
+            });
+        }
+
+        window.onload = main;
+    </script>
+</head>
+<body>
+
+<div class="map-wrapper">
+    <div id='map'></div>
+</div>
+
+</body>
+</html>
