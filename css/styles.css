@@ -1,0 +1,27 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+.map-wrapper { 
+    width: 100%;
+    height: 100%; 
+    position: fixed;
+}
+
+.name-textbox {
+    margin-bottom: 10px;
+}
+.add-new-bookmark-button {
+    margin-left: 10px !important;
+}
+
+/* Overriden CSS */
+.leaflet-popup-content {
+    max-width: 220px;
+    max-height: 175px;
+}
