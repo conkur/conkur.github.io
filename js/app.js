@@ -82,7 +82,7 @@ function setupBookmarks(map) {
                 ...customFormPopupFields,
             },
             template: `
-                <form class="{{ formClass }}">
+                <form class="{{ formClass }} autocomplete="off"">
                     <div class="input-group">
                         <input type="text" name="bookmark-name" placeholder="Marker name" class="name-textbox form-control {{ inputClass }}" value="{{ name }}">
                         <button type="submit" class="add-new-bookmark-button input-group-addon {{ submitClass }}">{{ submitText }}</button>
